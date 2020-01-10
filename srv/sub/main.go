@@ -13,8 +13,6 @@ import (
 	"github.com/micro/go-plugins/broker/rabbitmq"
 
 	sub "github.com/amrnt/micro-test/srv/sub/proto/sub"
-	gclient "github.com/micro/go-micro/client/grpc"
-	gserver "github.com/micro/go-micro/server/grpc"
 )
 
 func main() {
@@ -37,23 +35,6 @@ func main() {
 
 	// Please comment out one of the service
 	service = grpc.NewService(
-		micro.Name("go.micro.srv.sub"),
-		micro.Version("latest"),
-		micro.Broker(brkr),
-	)
-
-	// Same as grpc.NewService above
-	service = micro.NewService(
-		micro.Name("go.micro.srv.sub"),
-		micro.Version("latest"),
-		micro.Broker(brkr),
-		micro.Client(gclient.NewClient()),
-		micro.Server(gserver.NewServer()),
-	)
-
-	// Comment out this to see that
-	// `RegisterSubscriber` is not working anymore
-	service = micro.NewService(
 		micro.Name("go.micro.srv.sub"),
 		micro.Version("latest"),
 		micro.Broker(brkr),
@@ -130,6 +111,24 @@ func main() {
 		fmt.Println("service.Options().Broker.Subscribe", err)
 	}
 	defer sx.Unsubscribe()
+
+	sxx, err := service.Options().Broker.Subscribe(
+		"go.micro.srv.sub.topic.4",
+		func(p broker.Event) error {
+			fmt.Println("[sub] received message:", string(p.Message().Body), "header", p.Message().Header)
+			return nil
+			// return fmt.Errorf("err")
+		},
+		broker.Queue("go.micro.srv.sub.topic.4.default"),
+		rabbitmq.DurableQueue(),
+		broker.DisableAutoAck(),
+		rabbitmq.QueueArguments(map[string]interface{}{"x-queue-type": "quorum"}),
+		rabbitmq.RequeueOnError(),
+	)
+	if err != nil {
+		fmt.Println("service.Options().Broker.Subscribe", err)
+	}
+	defer sxx.Unsubscribe()
 
 	// Run service
 	if err := service.Run(); err != nil {

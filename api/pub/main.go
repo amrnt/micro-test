@@ -46,9 +46,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	publisher := micro.NewPublisher("go.micro.srv.sub.topic.1", service.Client())
-	publisher2 := micro.NewPublisher("go.micro.srv.sub.topic.2", service.Client())
-	webService.HandleFunc("/", handler.Call(service, publisher, publisher2))
+	webService.HandleFunc("/", handler.Call(service))
 
 	// Run service
 	if err := webService.Run(); err != nil {

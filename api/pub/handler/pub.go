@@ -18,7 +18,7 @@ import (
 type Pub struct{}
 
 // Call ...
-func Call(service micro.Service, p micro.Publisher, p2 micro.Publisher) func(http.ResponseWriter, *http.Request) {
+func Call(service micro.Service) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		var err error
 
@@ -55,6 +55,8 @@ func Call(service micro.Service, p micro.Publisher, p2 micro.Publisher) func(htt
 		// setting or passing pubOpt Context is not working
 		// BUT event is being published if you comment out the options
 		// from below
+
+		p := micro.NewPublisher("go.micro.srv.sub.topic.1", service.Client())
 		err = p.Publish(
 			pubOpt.Context, // context.Background()
 			&sub.Message{Say: "Hello world!"},
@@ -72,6 +74,7 @@ func Call(service micro.Service, p micro.Publisher, p2 micro.Publisher) func(htt
 
 		// Same thing but publish to topic 2
 		// Subscriber doesnt set any new context
+		p2 := micro.NewPublisher("go.micro.srv.sub.topic.2", service.Client())
 		err = p2.Publish(
 			pubOpt.Context, // context.Background()
 			&sub.Message{Say: "Hello world!"},
@@ -84,6 +87,27 @@ func Call(service micro.Service, p micro.Publisher, p2 micro.Publisher) func(htt
 			log.Errorf("go.micro.srv.sub.topic.2: error publishing: %s\n", err.Error())
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("Something went wrong publishing go.micro.srv.sub.topic.2"))
+			return
+		}
+
+		///
+
+		// setting or passing pubOpt Context is not working
+		// BUT event is being published if you comment out the options
+		// from below
+		p4 := micro.NewPublisher("go.micro.srv.sub.topic.4", service.Client())
+		err = p4.Publish(
+			pubOpt.Context, // context.Background()
+			&sub.Message{Say: "Hello world!"},
+			func(options *client.PublishOptions) {
+				// options.Exchange = "myexchange" // uncomment this
+				options.Context = pubOpt.Context
+			},
+		)
+		if err != nil {
+			log.Errorf("go.micro.srv.sub.topic.1: error publishing: %s\n", err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Something went wrong publishing go.micro.srv.sub.topic.1"))
 			return
 		}
 
