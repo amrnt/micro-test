@@ -97,7 +97,7 @@ func main() {
 	sx, err := service.Options().Broker.Subscribe(
 		"go.micro.srv.sub.topic.3",
 		func(p broker.Event) error {
-			fmt.Println("[sub] received message:", string(p.Message().Body), "header", p.Message().Header)
+			fmt.Println("[sub topic.3] received message:", string(p.Message().Body), "header", p.Message().Header)
 			return nil
 			// return fmt.Errorf("err")
 		},
@@ -115,7 +115,7 @@ func main() {
 	sxx, err := service.Options().Broker.Subscribe(
 		"go.micro.srv.sub.topic.4",
 		func(p broker.Event) error {
-			fmt.Println("[sub] received message:", string(p.Message().Body), "header", p.Message().Header)
+			fmt.Println("[sub topic.4] received message:", string(p.Message().Body), "header", p.Message().Header)
 			return nil
 			// return fmt.Errorf("err")
 		},

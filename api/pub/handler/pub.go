@@ -31,7 +31,7 @@ func Call(service micro.Service) func(http.ResponseWriter, *http.Request) {
 
 		msg := &broker.Message{
 			Header: map[string]string{"id": "1"},
-			Body:   []byte("hello"),
+			Body:   []byte("hello world topic 3!"),
 		}
 
 		err = service.Options().Broker.Publish("go.micro.srv.sub.topic.3", msg, rabbitmq.DeliveryMode(amqp.Persistent))
@@ -56,10 +56,10 @@ func Call(service micro.Service) func(http.ResponseWriter, *http.Request) {
 		// BUT event is being published if you comment out the options
 		// from below
 
-		p := micro.NewPublisher("go.micro.srv.sub.topic.1", service.Client())
+		p := micro.NewPublisher("go.micro.srv.sub.c", service.Client())
 		err = p.Publish(
 			pubOpt.Context, // context.Background()
-			&sub.Message{Say: "Hello world!"},
+			&sub.Message{Say: "Hello world topic 1!"},
 			func(options *client.PublishOptions) {
 				// options.Exchange = "myexchange"
 				// options.Context = pubOpt.Context
@@ -77,7 +77,7 @@ func Call(service micro.Service) func(http.ResponseWriter, *http.Request) {
 		p2 := micro.NewPublisher("go.micro.srv.sub.topic.2", service.Client())
 		err = p2.Publish(
 			pubOpt.Context, // context.Background()
-			&sub.Message{Say: "Hello world!"},
+			&sub.Message{Say: "Hello world topic 2!"},
 			func(options *client.PublishOptions) {
 				// options.Exchange = "myexchange"
 				// options.Context = pubOpt.Context
@@ -98,7 +98,7 @@ func Call(service micro.Service) func(http.ResponseWriter, *http.Request) {
 		p4 := micro.NewPublisher("go.micro.srv.sub.topic.4", service.Client())
 		err = p4.Publish(
 			pubOpt.Context, // context.Background()
-			&sub.Message{Say: "Hello world!"},
+			&sub.Message{Say: "Hello world topic 4!"},
 			func(options *client.PublishOptions) {
 				// options.Exchange = "myexchange" // uncomment this
 				options.Context = pubOpt.Context
